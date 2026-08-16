@@ -19,7 +19,7 @@ labels = "{{LABELS}}"
 
 [[devices]]
 type = "via/6522"
-address = 0xCF00
+address = 0xCFF0
 
 [[devices]]
 type = "console"
