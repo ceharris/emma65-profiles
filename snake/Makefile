@@ -1,12 +1,10 @@
-.PHONY: all clean
+.PHONY: all profile staging clean
 .SUFFIXES: .bin .hex .lbl .lst .map .o .s .s19 .sym .tmp
 
 EXECUTABLE=snake
 TEMPLATE_TOML=emulator-template.toml
 PROFILE=$(HOME)/.emma/debugger/profiles/$(EXECUTABLE)
-STAGING=../build/snake
-LOAD_OFFSET=0xE000
-EXECUTION_START_LABEL=start
+STAGING=../build/$(EXECUTABLE)
 LD_CONFIG=$(EXECUTABLE).cfg
 BIN_IMAGE=$(EXECUTABLE).bin
 
@@ -16,13 +14,14 @@ MODULES=snake.o console.o delay.o display.o keys.o model.o prng.o state.o \
 	timer.o vectors.o
 
 AS=ca65
-ASFLAGS=--cpu W65C02 -I ../include
+ASFLAGS=-g --cpu W65C02
 LD=ld65
 LDFLAGS=--config $(LD_CONFIG)
 
 all: staging
 
 profile: $(BIN_IMAGE)
+	-mkdir -p $(PROFILE)
 	cp $(BIN_IMAGE) $(PROFILE)/program.bin
 	cp $(EXECUTABLE).lbl $(PROFILE)/program.lbl
 
