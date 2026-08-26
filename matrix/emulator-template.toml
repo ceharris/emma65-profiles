@@ -1,11 +1,10 @@
-cpu-variant = "WDC65C02"
-clock-speed-hz = 7372800
+cpu-variant = "65C02"
+clock-speed-hz = 1843200
 
 [[devices]]
 type = "ram"
 address = 0x0000
-size = 16384
-fill = 0
+size = 2048
 
 [[devices]]
 type = "display/char"
@@ -13,21 +12,11 @@ address = 0xc000
 palette = "~/.emma/debugger/profiles/matrix/palette.txt"
 
 [[devices]]
-type = "keyboard"
-address = 0xfff8
-break = 3
-
-[[devices]]
 type = "rom"
-address = 0xe000
-size = 8192
+address = 0xf000
+size = 4096
 image = "{{ROM_IMAGE}}"
 labels = "{{LABELS}}"
-
-[[devices]]
-type = "via/6522"
-address = 0xff80
-transport = "unix:~/.emma/sock/via6522"
 
 [[devices]]
 type = "lfsr"

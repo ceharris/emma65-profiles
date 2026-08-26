@@ -1,5 +1,5 @@
-                .include "delay.h.s"
                 .include "matrix.h.s"
+                .include "variables.h.s"
 
                 .global main
 main:
@@ -10,7 +10,6 @@ main:
 @loop:
                 jsr matrix_update
                 lda #5
-                jsr delay
                 bra @loop
 
             

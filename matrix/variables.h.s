@@ -11,5 +11,4 @@
 
                 .globalzp drips_table                
 
-    
         .endif

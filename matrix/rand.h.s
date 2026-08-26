@@ -4,7 +4,13 @@
                 LFSR_LO = $FFF6
                 LFSR_HI = LFSR_LO + 1
 
-;                .global rand_flip
+
+        .macro rand_flip
+                lda LFSR_LO
+                lda LFSR_HI
+                asl
+        .endmacro
+
                 .global rand_range
                 .global rand_cmp
                 .global rand_printable

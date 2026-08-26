@@ -5,22 +5,8 @@
                 ASCII_PRINTABLES = 128 - 32 - 2
                 ASCII_START = 33
 
-                LATIN_PRINTABLES = 128
-                LATIN_START = 128
-
-
-;-----------------------------------------------------------------------
-; rand_flip:
-; A random coin flip.
-;
-; On return:
-;   carry flag randomly set
-;
-rand_flip:
-                lda LFSR_LO
-                lda LFSR_HI
-                asl
-                rts
+                LATIN_PRINTABLES = 42
+                LATIN_START = 256 - LATIN_PRINTABLES
 
 
 ;-----------------------------------------------------------------------
@@ -82,7 +68,7 @@ rand_cmp:
 ;   B, C clobbered
 ;
 rand_printable:
-                jsr rand_flip
+                rand_flip
                 bcs @rand_latin
 
                 lda #ASCII_PRINTABLES
@@ -96,4 +82,3 @@ rand_printable:
                 clc
                 adc #LATIN_START
                 rts
-
