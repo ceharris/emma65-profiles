@@ -11,5 +11,9 @@
                 DISPLAY_COLOR_RAM = DISPLAY_BASE + DISPLAY_SIZE
                 DISPLAY_CONTROL = DISPLAY_BASE + 2*DISPLAY_SIZE
                 DISPLAY_STATUS = DISPLAY_BASE + 2*DISPLAY_SIZE + 1
+                DISPLAY_CONTROL_DATA = DISPLAY_STATUS
+
+                DISPLAY_SWAP = $1
+                DISPLAY_SET_COLOR = $8
 
         .endif

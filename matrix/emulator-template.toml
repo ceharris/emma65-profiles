@@ -9,7 +9,6 @@ size = 2048
 [[devices]]
 type = "display/char"
 address = 0xc000
-palette = "~/.emma/debugger/profiles/matrix/palette.txt"
 
 [[devices]]
 type = "rom"
