@@ -210,9 +210,7 @@ drips_add:
                 bmi @skip_drip          ; go if drip live
 
         ; coin flip to determine if it's a bright drip
-                lda LFSR_LO
-                lda LFSR_HI
-                asl
+                rand_flip
                 lda #DRIP_LIVE
                 bcc @not_bright
                 ora #DRIP_BRIGHT
