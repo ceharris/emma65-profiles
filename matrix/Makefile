@@ -8,11 +8,11 @@ STAGING=../build/$(EXECUTABLE)
 LD_CONFIG=$(EXECUTABLE).cfg
 BIN_IMAGE=$(EXECUTABLE).bin
 
-INCLUDES=$(LD_CONFIG) colors.h.s console.h.s display.h.s rand.h.s variables.h.s 
-MODULES=main.o matrix.o colors.o rand.o console.o variables.o isr.o vectors.o
+INCLUDES=$(LD_CONFIG) colors.h.s display.h.s rand.h.s variables.h.s 
+MODULES=main.o matrix.o colors.o rand.o variables.o isr.o vectors.o
 
 AS=ca65
-ASFLAGS=-g --cpu 65C02
+ASFLAGS=-g --cpu W65C02
 LD=ld65
 LDFLAGS=--config $(LD_CONFIG)
 
@@ -35,7 +35,6 @@ clean:
 
 main.o: main.s $(INCLUDES)
 colors.o: colors.s $(INCLUDES)
-console.o: console.s $(INCLUDES)
 isr.o: isr.s $(INCLUDES)
 matrix.o: matrix.s $(INCLUDES)
 rand.o: rand.s $(INCLUDES)

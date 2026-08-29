@@ -16,4 +16,7 @@
                 DISPLAY_SWAP = $1
                 DISPLAY_SET_COLOR = $8
 
+                KEYBOARD_IN = $FFF8
+                KEYBOARD_LATCH = KEYBOARD_IN + 1
+
         .endif
