@@ -14,8 +14,9 @@ main:
                 jsr matrix_init
 @loop:
                 jsr matrix_update
+@drain:
                 lda KEYBOARD_IN
                 beq @loop
                 cmp #3
-                bne @loop
+                bne @drain
                 stp
