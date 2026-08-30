@@ -1,5 +1,5 @@
                 .include "display.h.s"
-                .include "matrix.h.s"
+                .include "rain.h.s"
                 .include "rand.h.s"
                 .include "variables.h.s"
 
@@ -30,20 +30,20 @@
 
 
 ;-----------------------------------------------------------------------
-; matrix_init:
-; Initializes the matrix.
+; rain_init:
+; Initializes the matrix used to simulate digital rain.
 ;
-matrix_init:
+rain_init:
                 jsr cells_init
                 jsr drips_init
                 rts
 
 
 ;-----------------------------------------------------------------------
-; matrix_update:
-; Updates the matrix.
+; rain_update:
+; Updates the matrix used to simulate digital rain.
 ;
-matrix_update:
+rain_update:
                 lda #<PROB_DRIP
                 sta C
                 lda #>PROB_DRIP

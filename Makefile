@@ -9,12 +9,12 @@ all: staging
 	tar -C $(STAGING_DIR) -cf - . | tar -C $(TARGET_BASE)/$(TEMPLATES_DIR) -xf -
 
 staging:
-	make -C matrix staging 
+	make -C rain staging 
 	make -C ehbasic staging
 	make -C snake staging
 
 clean:
-	make -C matrix staging
+	make -C rain staging
 	make -C ehbasic clean
 	make -C snake clean
 	-rm -fr $(STAGING_DIR)
