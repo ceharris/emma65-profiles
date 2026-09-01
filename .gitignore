@@ -6,4 +6,5 @@
 *.map
 *.lst
 *.tmp
+.vscode/
 build/
