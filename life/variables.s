@@ -14,7 +14,7 @@ WL:             .res 1
 WH:             .res 1
 
 surface_type:   .res 1
-
+generations:    .res 4
 
                 .segment "BSS"
 

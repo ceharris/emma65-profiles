@@ -10,6 +10,10 @@
 
                 MATRIX_COUNT = 1
 
+                COLOR_DEAD = 0
+                COLOR_DYING = 7
+                COLOR_INFANT = 15
+
                 .global display_init
                 .global display_flip
 

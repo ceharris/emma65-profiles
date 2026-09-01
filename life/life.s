@@ -3,7 +3,8 @@
                 .include "variables.h.s"
 
                 CELLS = PIXEL_MEM
-                LIVE_CELL = 11
+                LIVE_CELL = COLOR_INFANT
+                DEAD_CELL = COLOR_DYING
 
                 .segment "CODE"
 
@@ -164,55 +165,64 @@ _eval_cell:
 
         ; cell (X - 1, Y - 1)
                 lda row_i-1,x
-                beq @cell_x_y_m1        ; go if not live
+                cmp #(DEAD_CELL + 1)
+                bcc @cell_x_y_m1        ; go if not live
                 iny                     ; count live cell
 
         ; cell (X, Y - 1)
 @cell_x_y_m1:
                 lda row_i,x
-                beq @cell_x_p1_y_m1     ; go if not live
+                cmp #(DEAD_CELL + 1)
+                bcc @cell_x_p1_y_m1     ; go if not live
                 iny                     ; count live cell
 
         ; cell (X + 1, Y - 1)
 @cell_x_p1_y_m1:
                 lda row_i+1,x
-                beq @cell_x_m1_y        ; go if not live
+                cmp #(DEAD_CELL + 1)
+                bcc @cell_x_m1_y        ; go if not live
                 iny                     ; count live cell
 
         ; cell (X - 1, Y)
 @cell_x_m1_y:
                 lda row_j-1,x
-                beq @cell_x_y           ; go if not live
+                cmp #(DEAD_CELL + 1)
+                bcc @cell_x_y           ; go if not live
                 iny                     ; count live cell
 
         ; cell (X, Y)
 @cell_x_y:
                 lda row_j,x
-                beq @cell_x_p1_y        ; go if not live
+                cmp #(DEAD_CELL + 1)
+                bcc @cell_x_p1_y        ; go if not live
                 iny                     ; count live cell
 
         ; cell (X + 1, Y)
 @cell_x_p1_y:
                 lda row_j+1,x
-                beq @cell_x_m1_y_p1     ; go if not live
+                cmp #(DEAD_CELL + 1)
+                bcc @cell_x_m1_y_p1     ; go if not live
                 iny                     ; count live cell
 
         ; cell (X - 1, Y + 1)
 @cell_x_m1_y_p1:
                 lda row_k-1,x
-                beq @cell_x_y_p1        ; go if not live
+                cmp #(DEAD_CELL + 1)
+                bcc @cell_x_y_p1        ; go if not live
                 iny                     ; count live cell
 
         ; cell (X, Y + 1)
 @cell_x_y_p1:
                 lda row_k,x
-                beq @cell_x_p1_y_p1     ; go if not live
+                cmp #(DEAD_CELL + 1)
+                bcc @cell_x_p1_y_p1     ; go if not live
                 iny                     ; count live cell
 
         ; cell (X + 1, Y + 1)
 @cell_x_p1_y_p1:
                 lda row_k+1,x
-                beq @sum_done           ; go if not live
+                cmp #(DEAD_CELL + 1)
+                bcc @sum_done           ; go if not live
                 iny                     ; count live cell
 
 @sum_done:
@@ -220,21 +230,38 @@ _eval_cell:
                 ldy B                   ; recover Y
                 cmp #3
                 bcc @death
+                cmp #5
+                bcs @death
+                cmp #3
                 beq @life
-                cmp #4
-                bne @death
 
         ; cell state is unchanged
                 lda row_j,x
-                rts
+                beq @done               ; go if already dead
+                cmp #(DEAD_CELL + 1)
+                beq @done               ; go if fully mature
+                bra @age
 
         ; cell is now dead
 @death:
-                lda #0
-                rts
+                lda row_j,x
+                beq @done               ; go if already dead
+                cmp #(DEAD_CELL+1)
+                bcc @age                ; go age if not living
+                lda #(DEAD_CELL+1)      
+                bra @age                ; age into dead zone
+
         ; cell is now live
 @life:
-                lda #LIVE_CELL
+                lda row_j,x
+                cmp #(DEAD_CELL + 1)
+                beq @done               ; go if fully mature
+                cmp #(DEAD_CELL + 1)
+                bcs @age                ; go if alive
+                lda #(LIVE_CELL+1)
+@age:
+                dec
+@done:
                 rts
 
 

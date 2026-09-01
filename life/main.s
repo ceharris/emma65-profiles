@@ -23,7 +23,7 @@ main:
 
 @loop:
                 jsr display_flip
-                jsr delay
+;                jsr delay
                 jsr life_update
                 bra @loop
 

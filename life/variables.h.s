@@ -18,6 +18,7 @@
                 .globalzp WH
         
                 .globalzp surface_type
+                .globalzp generations
 
                 .global row_0
                 .global row_i

@@ -10,7 +10,7 @@ size = 2048
 type = "display/matrix"
 address = 0xc000
 register-address = 0xfff4
-matrix-count = 8
+arrangement = "1x1"
 
 [[devices]]
 type = "rom"

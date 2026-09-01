@@ -8,7 +8,7 @@
                 VIA_ACR = VIA_BASE + $B
                 VIA_IFR = VIA_BASE + $D
 
-                TIMER_PERIOD = 18432
+                TIMER_PERIOD = 9216
 
                 VIA_IFR_T1 = $40
 
