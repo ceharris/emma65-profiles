@@ -20,10 +20,11 @@
 ;           followed by a Y-coordinate, in a cartesian coordinate 
 ;           system whose center is the midpoint of the width and 
 ;           height of the cell array.
+;       surface_type = cell array surface_type 
+;           (SURFACE_RECTANGLE, SURFACE_CYLINDER, SURFACE_TOROID)
 ;
 life_init:
                 jsr _init_cells
-                jsr _init_for_rect_space
                 jsr _init_using_vector
                 rts
 
@@ -37,9 +38,18 @@ life_update:
         ; preserve state of row 0
                 jsr _copy_0_to_row_0
       
-        ; copy row N-1 into row_i buffer 
+        ; cells of peripheral row depend on surface type
+                lda surface_type
+                bne @non_rect_i
+        ; rectangular surface: peripheral cells are zero
+                jsr _init_row_i
+                bra @copy
+        ; cylindrical or toroidal surface: peripheral cells
+        ; are those of opposing edge
+@non_rect_i:
                 jsr _copy_N_1_to_row_i
 
+@copy:
         ; copy row 0 into row_j buffer
                 lda #<CELLS
                 sta VL
@@ -74,8 +84,18 @@ life_update:
                 dec C
                 bne @loop
 
+        ; cells of peripheral row depend on surface type
+                lda surface_type
+                bne @non_rect_k
+        ; rectangular surface: peripherals cells are zero
+                jsr _init_row_k
+                bra @eval_N_1
+        ; cylindrical or toroidal surface: peripheral cells
+        ; are those of opposing edge
+@non_rect_k:
                 jsr _copy_row_0_to_k
         
+@eval_N_1:
         ; evaluate cells of row N - 1
                 jsr _eval_cells
 
@@ -240,35 +260,75 @@ _copy_0_to_row_0:
 
 ;-----------------------------------------------------------------------
 ; _copy_row_0_to_k:
-; Copies buffer `row_0` to `row_k`. The copy is performed such that the
-; first and last bytes of buffer `row_k` are undisturbed.
+; Copies buffer `row_0` to `row_k`, accounting for peripheral cells 
+; according to surface type.
 ;
 ; On return:
 ;       row_i[1..WIDTH+1) = row_0[0..WIDTH)
 ;       X clobbered
 ;
 _copy_row_0_to_k:
+        ; peripheral cell depends on surface type
+                lda surface_type
+                cmp #SURFACE_TOROID
+                beq @toroid_0
+        ; rectangular or cylindrical surface: peripheral cell is zero
+                stz row_k
+                bra @copy
+        ; toroidal surface: peripheral cell is the opposing edge
+@toroid_0:
+                lda row_0 + WIDTH - 1
+                sta row_k
+
+        ; transfer cells to buffer
+@copy:
                 ldx #0
 @loop:
                 lda row_0,x
                 inx
                 sta row_k,x
-                cpx #WIDTH
+                cpx #WIDTH+1
                 bne @loop
+
+        ; peripheral cell depends on surface type
+                lda surface_type
+                cmp #SURFACE_TOROID
+                beq @toroid_N_1
+        ; rectangular or cylindrical surface: peripheral cell is zero
+                stz row_k,x
+                rts
+        ; toroidal surface: peripheral cell is the opposing edge
+@toroid_N_1:
+                lda row_0
+                sta row_j,x
                 rts
 
 
 ;-----------------------------------------------------------------------
 ; _copy_to_row_j:
 ; Copies the row whose first cell is addressed by V to evaluation buffer
-; `row_j`. The copy is performed such that the first and last bytes of
-; buffer `row_j` are undisturbed.
+; `row_j`, accounting for peripheral cells according to surface type.
 ;
 ; On return:
 ;       row_j[1..WIDTH+1) = V[0..WIDTH)
 ;       X, Y clobbered
 ;
 _copy_to_row_j:
+        ; peripheral cell depends on surface type
+                lda surface_type
+                cmp #SURFACE_TOROID
+                beq @toroid_0
+        ; rectangular or cylindrical surface: zero the peripheral cell
+                stz row_j               
+                bra @copy
+        ; toroid surface: peripheral cell is the opposing edge
+@toroid_0:
+                ldy #(WIDTH - 1)
+                lda (V),y
+                sta row_j
+
+        ; transfer cells to the buffer
+@copy:
                 ldx #1
                 ldy #0
 @loop:
@@ -278,20 +338,47 @@ _copy_to_row_j:
                 iny
                 cpy #WIDTH
                 bne @loop
+
+        ; peripheral cell depends on surface type
+                lda surface_type
+                cmp #SURFACE_TOROID
+                beq @toroid_N_1
+        ; rectangular or cylindrical surface: peripheral cell is zero
+                stz row_j,x
+                rts
+        ; toroidal surface: peripheral cell is the opposing edge
+@toroid_N_1:
+                ldy #0
+                lda (V),y
+                sta row_j,x
                 rts
 
 
 ;-----------------------------------------------------------------------
 ; _copy_to_row_k: 
 ; Copies the row whose first cell is addressed by V to evaluation buffer
-; `row_k`. The copy is performed such that the first and last bytes of
-; buffer `row_k` are undisturbed.
+; `row_k`, accounting for peripheral cells according to surface type.
 ;
 ; On return:
 ;       row_k[1..WIDTH+1) = V[0..WIDTH)
 ;       X, Y clobbered
 ;
 _copy_to_row_k:
+        ; peripheral cell depends on surface type
+                lda surface_type
+                cmp #SURFACE_TOROID
+                beq @toroid_0
+        ; rectangular or cylindrical surface: zero the peripheral cell
+                stz row_k               
+                bra @copy
+        ; toroid surface: peripheral cell is the opposing edge
+@toroid_0:
+                ldy #(WIDTH - 1)
+                lda (V),y
+                sta row_k
+
+        ; transfer cells to buffer
+@copy:
                 ldx #1
                 ldy #0
 @loop:
@@ -301,6 +388,19 @@ _copy_to_row_k:
                 iny
                 cpy #WIDTH
                 bne @loop
+
+        ; peripheral cell depends on surface type
+                lda surface_type
+                cmp #SURFACE_TOROID
+                beq @toroid_N_1
+        ; rectangular or cylindrical surface: peripheral cell is zero
+                stz row_k,x
+                rts
+        ; toroidal surface: peripheral cell is the opposing edge
+@toroid_N_1:
+                ldy #0
+                lda (V),y
+                sta row_k,x
                 rts
 
 
@@ -344,21 +444,82 @@ _copy_row_k_to_j:
 
 ;-----------------------------------------------------------------------
 ; _copy_N_1_to_row_i:
-; Copies the last row of the cell array to evaluation buffer `row_i`.
-; The copy is performed such that the first and last bytes of buffer 
-; `row_i` are undisturbed.
+; Copies the last row of the cell array to evaluation buffer `row_i`,
+; accounting for peripheral cells according to surface type.
 ;
 ; On return:
-;       row_i[1..WIDTH+2) = CELLS[WIDTH*(HEIGHT -1)..WIDTH*HEIGHT)
+;       row_i[1..WIDTH+1) = CELLS[WIDTH*(HEIGHT -1)..WIDTH*HEIGHT)
 ;       X clobbered
 ;
 _copy_N_1_to_row_i:
+        ; peripheral cell depends on surface type
+                lda surface_type
+                cmp #SURFACE_TOROID
+                beq @toroid_0
+        ; rectangular or cylindrical surface: peripheral cell is zero
+                stz row_k
+                bra @copy
+        ; toroidal surface: peripheral cell is the opposing edge
+@toroid_0:
+                lda CELLS + WIDTH*HEIGHT - 1
+                sta row_k
+
+        ; transfer cells to the buffer
+@copy:
                 ldx #0
 @loop:
-                lda CELLS + WIDTH*(HEIGHT -1),x
+                lda CELLS + WIDTH*(HEIGHT - 1),x
                 inx
                 sta row_i,x
                 cpx #WIDTH+1
+                bne @loop
+
+        ; peripheral cell depends on surface type
+                lda surface_type
+                cmp #SURFACE_TOROID
+                beq @toroid_N_1
+        ; rectangular or cylindrical surface: peripheral cell is zero
+                stz row_i,x
+                rts
+        ; toroidal surface: peripheral cell is the opposing edge
+@toroid_N_1:
+                lda CELLS + WIDTH*(HEIGHT - 1)
+                sta row_i,x
+                rts
+
+
+;-----------------------------------------------------------------------
+; _init_row_i:
+; Initializes evaluation buffer `row_i` to zero.
+;
+; On return:
+;       row_i[0..WIDTH+2) = 0
+;       X clobbered
+;
+_init_row_i:
+                ldx #0
+@loop:
+                stz row_i,x
+                inx
+                cpx #WIDTH+2
+                bne @loop
+                rts
+
+
+;-----------------------------------------------------------------------
+; _init_row_k:
+; Initializes evaluation buffer `row_k` to zero.
+;
+; On return:
+;       row_k[0..WIDTH+2) = 0
+;       X clobbered
+;
+_init_row_k:
+                ldx #0
+@loop:
+                stz row_k,x
+                inx
+                cpx #WIDTH+2
                 bne @loop
                 rts
 
@@ -405,14 +566,16 @@ _init_cells:
 
 
 ;-----------------------------------------------------------------------
-; _init_for_rect_space:
+; _init_for_rect_surface:
 ; Initializes the evaluation buffers for a rectangular space, in which
 ; the peripheral edges of the space are invariably lifeless.
 ;
 ; On return:
-;       X clobbered
+;       row_i[0] = 0, row_i[WIDTH + 1] = 0
+;       row_j[0] = 0, row_j[WIDTH + 1] = 0
+;       row_k[0] = 0, row_k[WIDTH + 1] = 0
 ;
-_init_for_rect_space:
+_init_for_rect_surface:
                 stz row_i
                 stz row_i + WIDTH + 1
                 stz row_j
@@ -420,7 +583,44 @@ _init_for_rect_space:
                 stz row_k
                 stz row_k + WIDTH + 1
                 rts
- 
+
+;-----------------------------------------------------------------------
+; _init_for_toroid_surface_0:
+; Initializes the evaluation buffers for a toroidal surface when
+; evaluating row 0.
+;
+; On entry:
+;       B = row index; B in[0..HEIGHT)
+;
+; On return:
+;       row_i[0] = CELLS[WIDTH * HEIGHT - 1]
+;       row_i[WIDTH+1] = CELLS[WIDTH * (HEIGHT - 1)]
+;
+
+_init_for_toroid_surface:
+                lda B
+                beq @row_0
+                cmp #(HEIGHT - 1)
+                beq @row_N_1
+
+
+@row_0:
+                lda CELLS + (WIDTH*HEIGHT - 1)
+                sta row_i
+                lda CELLS + (WIDTH*(HEIGHT - 1))
+                sta row_i + WIDTH + 1
+
+                stz row_i
+                stz row_i + WIDTH + 1
+                stz row_j
+                stz row_j + WIDTH + 1
+                stz row_k
+                stz row_k + WIDTH + 1
+                rts
+
+@row_N_1:
+
+
 ;-----------------------------------------------------------------------
 ; _init_using_vector:
 ; Initializes live cells using the state vector addressed by V.

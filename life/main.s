@@ -13,6 +13,8 @@ main:
         
                 jsr display_init
                 
+                lda #SURFACE_TOROID
+                sta surface_type
                 lda #<L_heptomino
                 sta VL
                 lda #>L_heptomino

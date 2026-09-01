@@ -2,6 +2,7 @@
                 VARIABLES_H = 1
 
                 .include "display.h.s"
+
                 WIDTH = DISPLAY_WIDTH
                 HEIGHT = DISPLAY_HEIGHT
 
@@ -16,6 +17,8 @@
                 .globalzp WL
                 .globalzp WH
         
+                .globalzp surface_type
+
                 .global row_0
                 .global row_i
                 .global row_j
