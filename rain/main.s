@@ -15,7 +15,7 @@ main:
 @loop:
                 jsr rain_update
                 jsr check_quit
-                bne @loop
+                bcc @loop
 
                 stp
 
@@ -28,8 +28,7 @@ main:
 ;
 check_quit:
                 lda KEYBOARD_IN
-                beq @done
-
+                beq @done               ; no key waiting
 
         ; if there's no input device mapped at KEYBOARD_IN
         ; could be reading from ROM.
@@ -40,16 +39,20 @@ check_quit:
 
         ; check for input the user is likely to use to exit the demo
                 cmp #3                  ; Ctrl+C?
-                beq @done
+                beq @quit
                 cmp #$1b                ; Escape?
-                beq @done
+                beq @quit
                 cmp #'Q'                ; (Q)uit?
-                beq @done
+                beq @quit
                 cmp #'q'                ; (q)uit?
-                beq @done
+                beq @quit
                 
         ; go back and check again to ensure input ring buffer is fully drained
                 bra check_quit
 
+@quit:
+                sec                     ; set carry to indicate quit
+                rts
 @done:
+                clc                     ; clear carry to indicate continue
                 rts
