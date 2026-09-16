@@ -13,10 +13,12 @@ staging:
 	make -C ehbasic staging
 	make -C lcd staging 
 	make -C snake staging
+	make -C brickbuster staging
 
 clean:
 	make -C rain staging
 	make -C ehbasic clean
 	make -C lcd staging
 	make -C snake clean
+	make -C brickbuster clean
 	-rm -fr $(STAGING_DIR)
