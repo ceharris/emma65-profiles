@@ -17,10 +17,9 @@
                 .globalzp screen_width
                 .globalzp screen_height
 
-                .globalzp ball_vec_x
-                .globalzp ball_vec_y
                 .globalzp ball_addr
-                .globalzp ball_prev_addr
+                .globalzp ball_dx
+                .globalzp ball_dy
                 .globalzp ball_x
                 .globalzp ball_y
                 .globalzp ball_prev_x

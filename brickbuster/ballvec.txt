@@ -1,0 +1,39 @@
+
+In grid_advance, we look ahead at two cells based on the current ball 
+unit vector in (dx, dy):
+
+(x + dx, y) and (x, y + dy) 
+
+cases:
+  (x + dx, y) is anything (x, y + dy) is an edge
+        dead ball
+        no change in position
+  (x + dx, y) is empty and (x, y + dy) is a empty:
+        no change to ball unit vector
+        new position is (x + dx, y + dy)
+  (x + dx, y) is not empty and (x, y + dy) is empty
+        negate x-component of ball unit vector
+        new position is (x + dx, y + dy)
+  (x + dx, y) is not empty and (x, y + dy) is a border:
+        negate both components of ball unit vector
+        new position is (x + dx, y + dy)
+  (x + dx, y) is empty and (x, y + dy) is a border
+        negate y-component of ball unit fector
+        new position is (x + dx, y + dy)
+  (x + dx, y) is empty and (x, y + dy) is left paddle
+        negate y-component of ball unit vector
+        set x-component of ball unit vector to -1
+        new position is (x + dx, y + dy) 
+  (x + dx, y) is empty and (x, y + dy) is middle left paddle
+        negate y-component of ball unit vector
+        set x-component of ball unit vector to -1
+        new position is (x, y + dy)
+  (x + dx, y) is empty and (x, y + dy) is middle right paddle
+        negate y-component of ball unit vector
+        set x-component of ball unit vector to +1
+        new position is (x, y + dy)
+  (x + dx, y) is empty and (x, y + dy) is right paddle
+        negate y-component of ball unit vector
+        set x-component of ball unit vector to +1
+        new position is (x + dx, y + dy)
+

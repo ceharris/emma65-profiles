@@ -134,10 +134,9 @@ ui_init:
 
 _write_cell:
                 beq @empty
+                bmi @empty
                 cmp #GRID_BORDER_TOP
                 beq @lower_half
-                cmp #GRID_BORDER_BOTTOM
-                beq @upper_half
                 cmp #GRID_BORDER_LEFT
                 beq @right_half
                 cmp #GRID_BORDER_RIGHT
@@ -146,11 +145,8 @@ _write_cell:
                 beq @quad_lower_right
                 cmp #GRID_CORNER_TOP_RIGHT
                 beq @quad_lower_left
-                cmp #GRID_CORNER_BOTTOM_LEFT
-                beq @quad_upper_right
-                cmp #GRID_CORNER_BOTTOM_RIGHT
-                beq @quad_upper_left
-
+                and #GRID_PADDLE
+                bne @upper_half
 @empty:
                 lda #' '
                 sta CONSOLE_IO
@@ -158,12 +154,12 @@ _write_cell:
                 sta CONSOLE_IO
                 rts
 
-@lower_half:
-                lda #$84
-                jsr @block_element
-                bra @block_element
 @upper_half:
                 lda #$80
+                jsr @block_element
+                bra @block_element
+@lower_half:
+                lda #$84
                 jsr @block_element
                 bra @block_element
 @right_half:
@@ -184,17 +180,6 @@ _write_cell:
                 bra @block_element
 @quad_lower_left:
                 lda #$96
-                jsr @block_element
-                lda #$20
-                sta CONSOLE_IO
-                rts
-@quad_upper_right:
-                lda #$20
-                sta CONSOLE_IO
-                lda #$9d
-                bra @block_element
-@quad_upper_left:
-                lda #$98
                 jsr @block_element
                 lda #$20
                 sta CONSOLE_IO

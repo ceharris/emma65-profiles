@@ -17,21 +17,22 @@ WH:             .res 1
 ; Grid width and height in cells
 grid_width:     .res 1
 grid_height:    .res 1
+
 ; Screen width and height in characters
 screen_height:  .res 1
 screen_width:   .res 1
 
-; Components of a unit vector that defines ball direction 
-ball_vec_x:     .res 1
-ball_vec_y:     .res 1
-
 ; Address of the ball within the grid
 ball_addr:      .res 2
-ball_prev_addr: .res 2
+
+; Components of a unit vector that defines ball direction 
+ball_dx:        .res 1
+ball_dy:        .res 1
 
 ; Grid coordinates of the ball
 ball_x:         .res 1
 ball_y:         .res 1
+
 ; Grid coordinates of ball's previous position
 ball_prev_x:    .res 1
 ball_prev_y:    .res 1
